@@ -19,3 +19,11 @@ docker build --tag k8s-deployer:0.1.0 .
 
 docker run --env-file echome_env.list -i k8s-deployer:0.1.0
 ```
+
+When it completes, ssh into the primary (first) node and run the following to use `kubectl`:
+
+```
+sudo cp /etc/kubernetes/admin.conf $HOME/ && sudo chown $(id -u):$(id -g) $HOME/admin.conf && export KUBECONFIG=$HOME/admin.conf
+```
+
+Or grab the file contents from `/etc/kubernetes/admin.conf` to your local machine and use `kubectl` locally.
