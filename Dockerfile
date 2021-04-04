@@ -7,6 +7,7 @@ RUN \
   apt install -y \
     curl \
     openssh-client \
+    unzip \
     python3 \
     python3-pip \
     git \
@@ -14,11 +15,8 @@ RUN \
     software-properties-common \
     lsb-release && \
   pip3 install --upgrade pip && \
-  pip3 install echome-cli && \
-  curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - && \
-  apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" && \
-  apt update && \
-  apt install -y vault
+  pip3 install echome-cli 
+
 
 RUN mkdir /ansible
 RUN echo "[local]" >> /etc/ansible/hosts && \
@@ -44,6 +42,10 @@ ENV ANSIBLE_SSH_PIPELINING True
 ENV PATH /ansible/bin:$PATH
 ENV PYTHONPATH /ansible/lib
 
+RUN \
+  curl https://releases.hashicorp.com/vault/1.7.0/vault_1.7.0_linux_amd64.zip -o vault_1.7.0_linux_amd64.zip && \
+  unzip vault_1.7.0_linux_amd64.zip && \
+  chmod 750 vault
 
 #ENTRYPOINT ["ansible-playbook"]
 CMD "/ansible/playbooks/init.sh"
