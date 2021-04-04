@@ -23,5 +23,9 @@ chmod 400 ./sshkey.pem
 echo "Running ansible playbook.."
 ansible-playbook -i inventory/cluster/inventory.ini  --become cluster.yml --private-key ./sshkey.pem
 
+sleep 500
+
 echo "Copying admin file to Vault"
 cat inventory/artifacts/admin.conf  | /ansible/playbooks/kubespray/vault kv put ${VAULT_ADMIN_PATH} admin.conf=-
+
+sleep 500
