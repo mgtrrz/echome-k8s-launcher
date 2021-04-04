@@ -17,7 +17,7 @@ cp -fp /mnt/k8s-cluster.yaml inventory/cluster/group_vars/k8s-cluster/k8s-cluste
 
 echo "Grabbing key from Vault.."
 /ansible/playbooks/kubespray/vault status
-/ansible/playbooks/kubespray/vault kv get -field data -field private_key ${VAULT_SVC_KEY_PATH} | ./sshkey.pem
+/ansible/playbooks/kubespray/vault kv get -field data -field private_key ${VAULT_SVC_KEY_PATH} > ./sshkey.pem
 chmod 400 ./sshkey.pem
 
 echo "Running ansible playbook.."
