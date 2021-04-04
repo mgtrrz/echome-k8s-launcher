@@ -10,9 +10,15 @@ RUN \
     python3 \
     python3-pip \
     git \
-    ansible && \
+    ansible \
+    software-properties-common \
+    lsb-release && \
   pip3 install --upgrade pip && \
-  pip3 install echome-cli 
+  pip3 install echome-cli && \
+  curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - && \
+  apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" && \
+  apt update && \
+  apt install -y vault
 
 RUN mkdir /ansible
 RUN echo "[local]" >> /etc/ansible/hosts && \
@@ -23,8 +29,8 @@ WORKDIR /ansible/playbooks
 RUN git clone https://github.com/kubernetes-sigs/kubespray.git
 
 COPY init.sh /ansible/playbooks/init.sh
-COPY inventory.ini /ansible/playbooks/inventory.ini
-COPY k8s-cluster.yml /ansible/playbooks/k8s-cluster.yml
+# COPY inventory.ini /ansible/playbooks/inventory.ini
+# COPY k8s-cluster.yml /ansible/playbooks/k8s-cluster.yml
 RUN chmod +x /ansible/playbooks/init.sh
 
 WORKDIR /ansible/playbooks/kubespray
