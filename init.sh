@@ -20,12 +20,17 @@ echo "Grabbing key from Vault.."
 /ansible/playbooks/kubespray/vault kv get -field data -field private_key ${VAULT_SVC_KEY_PATH} > ./sshkey.pem
 chmod 400 ./sshkey.pem
 
+echo "Grabbing echome service account.."
+echome_key=$(/ansible/playbooks/kubespray/vault kv get -field=key ${ECHOME_SVC_CREDS})
+echome_secret=$(/ansible/playbooks/kubespray/vault kv get -field=secret ${ECHOME_SVC_CREDS})
+
 echo "Running ansible playbook.."
 ansible-playbook -i inventory/cluster/inventory.ini  --become cluster.yml --private-key ./sshkey.pem
 
-sleep 500
-
 echo "Copying admin file to Vault"
-cat inventory/artifacts/admin.conf  | /ansible/playbooks/kubespray/vault kv put ${VAULT_ADMIN_PATH} admin.conf=-
+cat inventory/cluster/artifacts/admin.conf | /ansible/playbooks/kubespray/vault kv put ${VAULT_ADMIN_PATH} admin.conf=-
 
-sleep 500
+echo "Notifying home base of complete status"
+token=$(curl ${ECHOME_SERVER}${ECHOME_AUTH_LOGIN_API} -X POST --user ${echome_key}:${echome_secret} | grep 'access_token' | awk -F\" '{print $4}')
+
+curl -X POST -H "Authorization: Bearer ${token}" "${ECHOME_SERVER}${ECHOME_MSG_API}?Destination=kube&Type=StatusUpdate&ClusterID=${CLUSTER_ID}&Status=READY"
