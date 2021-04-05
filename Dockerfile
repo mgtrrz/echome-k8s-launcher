@@ -7,7 +7,7 @@ RUN \
   apt install -y \
     curl \
     openssh-client \
-    awk \
+    gawk \
     unzip \
     python3 \
     python3-pip \
